@@ -33,9 +33,8 @@ body {
    REGLAS OFICIALES DE IMPRESIÓN / PDF (A4 / CARTA)
    =================================================== */
 @media print {
-  @page {
-    size: auto;
-    margin: 10mm 15mm;
+  header, nav, aside, button, form, .print-hidden {
+    display: none !important;
   }
 
   body {
