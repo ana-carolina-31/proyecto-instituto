@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colores del template original */
+  --color-primary: #003366;
+  --color-primary-container: #002244;
+  --color-surface: #f8fafc;
+  --color-surface-dim: #e2e8f0;
+  --color-surface-container: #f1f5f9;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-error: #dc2626;
+
+  /* COLORES OFICIALES DON BOSCO */
+  --color-donbosco-azul: #0A10CC;
+  --color-donbosco-oscuro: #070B8C;
+  --color-donbosco-amarillo: #F2D707;
+  --color-donbosco-claro: #FEF9C3;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ===================================================
+   REGLAS OFICIALES DE IMPRESIÓN / PDF (A4 / CARTA)
+   =================================================== */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Oculta la asistencia si se elige Solo Notas */
+  body.print-solo-notas .seccion-asistencia {
+    display: none !important;
+  }
+
+  /* Oculta las notas si se elige Solo Asistencia */
+  body.print-solo-asistencia .seccion-notas {
+    display: none !important;
+  }
+
+  /* Evita que una fila de la tabla se corte por la mitad entre hojas */
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  table {
+    width: 100% !important;
+  }
+}
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 1.2cm 1cm 1.5cm 1cm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ocultar elementos de navegación y paneles interactivos */
+  header, nav, aside, button, form, .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Control modular según el botón presionado */
+  body.print-solo-notas .seccion-asistencia {
+    display: none !important;
+  }
+  body.print-solo-asistencia .seccion-notas {
+    display: none !important;
+  }
+
+  /* Tablas oficiales impresas a ancho completo */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px !important;
+  }
+
+  th, td {
+    border: 1px solid #1e3a8a !important;
+    padding: 6px 8px !important;
+    font-size: 10pt !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+  }
+
+  /* En la impresión de asistencia, convertir el formulario en lista limpia con firma */
+  .columna-firma-print {
+    display: table-cell !important;
+  }
+}

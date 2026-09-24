@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// USUARIOS (ADMIN Y PROFESORES)
+// ==========================================
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellidos String
+  clerkId   String?  @unique
+  ci        String
+  email     String   @unique
+  rol       String   // "ADMIN" o "PROFESOR"
+  materia   String?  // (Opcional) Matemáticas, Física, etc.
+  horaIngreso String? @default("13:40")
+  horarioSemanal String?
+
+  // CAMPOS PARA EL DOCENTE ASESOR
+  esAsesor       Boolean @default(false)
+  cursoAsesor    String? // Ej: "3ro de Secundaria"
+  paraleloAsesor String? // Ej: "A"
+
+  // Relaciones inversas
+  asistenciasPropias AsistenciaProfesor[]   
+  asistenciasTomadas AsistenciaEstudiante[] 
+  comunicados        Comunicado[]       
+  calificaciones     Calificacion[]    
+}
+
+// ==========================================
+// PADRES DE FAMILIA / TUTORES
+// ==========================================
+model Padre {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellidos String
+  ci        String
+  email     String   @unique
+  telefono  String
+  relacion  String   // Padre, Madre, Tutor...
+
+  estudiantes Estudiante[]
+  lecturas    LecturaComunicado[] 
+}
+
+// ==========================================
+// ESTUDIANTES
+// ==========================================
+model Estudiante {
+  id        Int      @id @default(autoincrement())
+  nombres   String
+  apellidos String
+  ci        String
+  email     String @unique
+  rude      String
+  curso     String
+  paralelo  String
+  idPadre   Int
+
+  padre          Padre                  @relation(fields: [idPadre], references: [id])
+  asistencias    AsistenciaEstudiante[]
+  calificaciones Calificacion[]
+}
+
+// ==========================================
+// CALIFICACIONES
+// ==========================================
+model Calificacion {
+  id             Int      @id @default(autoincrement())
+  idEstudiante   Int
+  idProfesor     Int
+  materia        String
+  trimestre      String
+  ser            Float
+  saber          Float
+  hacer          Float
+  autoevaluacion Float
+  notaFinal      Float
+
+  estudiante     Estudiante @relation(fields: [idEstudiante], references: [id])
+  profesor       Usuario    @relation(fields: [idProfesor], references: [id])
+}
+
+// ==========================================
+// ASISTENCIAS (Reglas Separadas)
+// ==========================================
+model AsistenciaProfesor {
+  id          Int      @id @default(autoincrement())
+  idProfesor  Int
+  fechaHora   DateTime @default(now())
+  tipo        String   //"ingreso" o "salida"
+  estado      String   // "Presente", "Falta", "Atraso", "Licencia"
+  observacion String?
+  
+  profesor    Usuario  @relation(fields: [idProfesor], references: [id])
+}
+
+model AsistenciaEstudiante {
+  id           Int      @id @default(autoincrement())
+  idEstudiante Int
+  idProfesor   Int      // El profesor que tomó la lista
+  fecha        DateTime @default(now())
+  estado       String   // "Presente", "Falta", "Atraso", "Licencia"
+  observacion  String?
+
+  estudiante   Estudiante @relation(fields: [idEstudiante], references: [id])
+  profesor     Usuario    @relation(fields: [idProfesor], references: [id])
+}
+
+// ==========================================
+// COMUNICADOS Y ACUSE DE RECIBO
+// ==========================================
+model Comunicado {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  contenido   String
+  autorId     Int    
+  tipo        String?  
+  dirigidoA   String   // "TODOS", "PADRES", "PROFESORES", etc.
+  fecha       DateTime @default(now())
+
+  autor       Usuario             @relation(fields: [autorId], references: [id])
+  lecturas    LecturaComunicado[] 
+}
+
+model LecturaComunicado {
+  id           Int      @id @default(autoincrement())
+  comunicadoId Int
+  idPadre      Int      // El padre que dio clic en "Entendido"
+  leidoEn      DateTime @default(now())
+
+  comunicado   Comunicado @relation(fields: [comunicadoId], references: [id])
+  padre        Padre      @relation(fields: [idPadre], references: [id])
+
+  @@unique([comunicadoId, idPadre])
+}
