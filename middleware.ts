@@ -13,7 +13,7 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
   }
 });
-
+export const runtime = "nodejs";
 export const config = {
   matcher: [
     // Omitir archivos estáticos internos de Next.js y extensiones comunes
