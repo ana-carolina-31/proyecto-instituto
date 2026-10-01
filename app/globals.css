@@ -33,7 +33,7 @@ body {
    REGLAS OFICIALES DE IMPRESIÓN / PDF (A4 / CARTA)
    =================================================== */
 @media print {
-  header, nav, aside, button, form, .print-hidden {
+  header, nav, aside, button, form, .print\:hidden {
     display: none !important;
   }
 
