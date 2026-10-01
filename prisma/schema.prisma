@@ -98,6 +98,8 @@ model AsistenciaProfesor {
   tipo        String   //"ingreso" o "salida"
   estado      String   // "Presente", "Falta", "Atraso", "Licencia"
   observacion String?
+  curso       String?
+  contenido   String? 
   
   profesor    Usuario  @relation(fields: [idProfesor], references: [id])
 }

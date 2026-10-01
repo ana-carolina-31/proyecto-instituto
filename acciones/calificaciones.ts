@@ -110,6 +110,7 @@ export async function actualizarCalificacion(formData: FormData): Promise<void> 
 
     // Revalida la pantalla activa del profesor para ver el cambio inmediatamente
     revalidatePath("/panel-de-control/profesor");
+    revalidatePath("/panel-de-control/profesor/calificaciones");
     revalidatePath("/panel-de-control/admin/calificaciones");
     revalidatePath("/panel-de-control/padres");
   } catch (error) {
@@ -130,7 +131,8 @@ export async function eliminarCalificacion(formData: FormData): Promise<void> {
     });
 
     revalidatePath("/panel-de-control/profesor");
-    revalidatePath("/panel-de-control/admin/calificaciones");
+    revalidatePath("/panel-de-control/profesor/calificaciones");
+    revalidatePath("/panel-de-control/admin/calificaciones");revalidatePath("/panel-de-control/admin/asistencias");
     revalidatePath("/panel-de-control/padres");
   } catch (error) {
     console.error("Error al eliminar calificación:", error);

@@ -1,5 +1,4 @@
 "use server";
-
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -18,26 +17,24 @@ export async function marcarAsistenciaProfesorPorCI(formData: FormData): Promise
   const ciRaw = formData.get("ci")?.toString() || "";
   const ci = ciRaw.replace(/[^0-9]/g, "").trim();
   const accionTipo = formData.get("tipo")?.toString() || "ENTRADA";
+  const curso = formData.get("curso")?.toString() || null;
+  const contenido = formData.get("contenido")?.toString() || null;
 
   if (!ci || ci === "0") return;
-
+  
   try {
     const docenteRaw = await prisma.usuario.findFirst({
-      where: {
-        ci,
-        rol: { in: ["PROFESOR", "DOCENTE"] }
-      }
+      where: { ci, rol: { in: ["PROFESOR", "DOCENTE"] } }
     });
-
+    
     if (!docenteRaw) return;
+    
     const docente = docenteRaw as unknown as DocenteConHorario;
-
     const ahora = new Date();
     const nombresDias = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
     const diaHoy = nombresDias[ahora.getDay()];
-
+    
     let horaPactada = docente.horaIngreso || "07:30";
-
     if (docente.horarioSemanal) {
       try {
         const schedule = JSON.parse(docente.horarioSemanal);
@@ -55,10 +52,7 @@ export async function marcarAsistenciaProfesorPorCI(formData: FormData): Promise
     finHoy.setHours(23, 59, 59, 999);
 
     const registrosHoy = await prisma.asistenciaProfesor.findMany({
-      where: {
-        idProfesor: docente.id,
-        fechaHora: { gte: inicioHoy, lte: finHoy }
-      }
+      where: { idProfesor: docente.id, fechaHora: { gte: inicioHoy, lte: finHoy } }
     });
 
     if (accionTipo === "ENTRADA" && registrosHoy.some((r) => r.tipo === "ENTRADA")) return;
@@ -88,6 +82,8 @@ export async function marcarAsistenciaProfesorPorCI(formData: FormData): Promise
         tipo: accionTipo,
         estado: estadoCalculado,
         observacion,
+        curso,
+        contenido,
         fechaHora: ahora
       }
     });
@@ -95,40 +91,22 @@ export async function marcarAsistenciaProfesorPorCI(formData: FormData): Promise
     revalidatePath("/panel-de-control/admin/profesor/asistencia");
     revalidatePath("/panel-de-control/profesor/asistencia");
   } catch (error) {
-    console.error("Error al registrar asistencia:", error);
-  }
-}
-
-export async function obtenerAsistenciasProfesor() {
-  try {
-    return await prisma.asistenciaProfesor.findMany({
-      take: 50,
-      include: { profesor: true },
-      orderBy: { fechaHora: "desc" }
-    });
-  } catch {
-    return [];
+    console.error(error);
   }
 }
 
 export async function justificarAsistenciaSecretaria(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   const nuevoEstado = formData.get("estado")?.toString() || "LICENCIA";
-
   if (!id) return;
-
   try {
     await prisma.asistenciaProfesor.update({
       where: { id },
-      data: {
-        estado: nuevoEstado,
-        observacion: "Justificado por Dirección / Secretaría"
-      }
+      data: { estado: nuevoEstado, observacion: "Justificado por Dirección / Secretaría" }
     });
-
     revalidatePath("/panel-de-control/admin/profesor/asistencia");
     revalidatePath("/panel-de-control/profesor/asistencia");
   } catch (error) {
-    console.error("Error al justificar asistencia:", error);
+    console.error(error);
   }
 }

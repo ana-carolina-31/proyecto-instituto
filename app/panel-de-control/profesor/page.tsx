@@ -150,12 +150,12 @@ export default async function PanelProfesorPage(props: { searchParams: Promise<{
         </div>
       </div>
 
-      {/* Centro Unificado de Exportación */}
+  
       <div className="space-y-2 print:hidden">
         <SelectorImpresionProfesor />
       </div>
 
-      {/* Encabezado con Botón de Salida */}
+    
       <header className="bg-blue-900 border-l-8 border-yellow-400 text-white p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 print:hidden">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -177,7 +177,7 @@ export default async function PanelProfesorPage(props: { searchParams: Promise<{
               title="Cerrar sesión"
               className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <span>🚪</span> Salir
+              <span>🚪</span> Cerrar Sesión
             </button>
           </SignOutButton>
         </div>
@@ -195,7 +195,7 @@ export default async function PanelProfesorPage(props: { searchParams: Promise<{
           <div className="print:hidden">
             {cursoSeleccionado && (
               <span className={`text-xs px-3 py-1.5 rounded-full font-bold ${asistenciaYaTomadaHoy ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-amber-100 text-amber-800 border border-amber-200'}`}>
-                {asistenciaYaTomadaHoy ? `✅ Lista de hoy completada (${asistenciasHoyCurso.length} registrados)` : "⚠️ Pendiente de registro hoy"}
+                {asistenciaYaTomadaHoy ? `Lista de hoy completada (${asistenciasHoyCurso.length} registrados)` : "⚠️ Pendiente de registro hoy"}
               </span>
             )}
           </div>
